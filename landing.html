@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>랜딩페이지</title>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js"></script>
+    <script>
+        const firebaseConfig = { /* 동일한 Firebase 설정 */ };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+</head>
+<body>
+    <h1>랜딩페이지</h1>
+    <div id="content"></div>
+
+    <script>
+        async function loadLandingPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get("id");
+
+            if (!id) {
+                document.getElementById("content").innerHTML = "<p>잘못된 접근</p>";
+                return;
+            }
+
+            const doc = await db.collection("landingPages").doc(id).get();
+            if (!doc.exists) {
+                document.getElementById("content").innerHTML = "<p>페이지가 존재하지 않습니다.</p>";
+                return;
+            }
+
+            const data = doc.data();
+            document.getElementById("content").innerHTML = `
+                <h2>${data.name}님의 랜딩페이지</h2>
+                <p>이메일: ${data.email}</p>
+                <p>전화번호: ${data.phone}</p>
+                <img src="${data.imageUrl}" width="300">
+            `;
+        }
+
+        loadLandingPage();
+    </script>
+</body>
+</html>
